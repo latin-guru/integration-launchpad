@@ -7,6 +7,12 @@ export default [
   { ignores: ['dist/', 'coverage/', 'test-results/', 'playwright-report/'] },
   js.configs.recommended,
   {
+    rules: {
+      // Allow `const { dropped: _x, ...rest } = obj` to remove a key on purpose.
+      'no-unused-vars': ['error', { varsIgnorePattern: '^_', ignoreRestSiblings: true }],
+    },
+  },
+  {
     files: ['src/**/*.{js,jsx}'],
     languageOptions: {
       globals: globals.browser,

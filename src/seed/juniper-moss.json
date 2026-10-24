@@ -2,7 +2,7 @@
   "project": {
     "id": "proj-juniper-moss",
     "customer": "Juniper & Moss",
-    "vertical": "Online plant shop (SMB e-commerce)",
+    "vertical": "Online plant shop, SMB e-commerce",
     "goLiveInDays": 21,
     "stakeholders": [
       { "name": "Priya Nandakumar", "role": "Owner, Juniper & Moss", "side": "customer" },

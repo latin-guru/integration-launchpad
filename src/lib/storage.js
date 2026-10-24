@@ -28,6 +28,7 @@ export function createSeedState(seed, today) {
       return { ...decision, date: addDays(today, -daysAgo) };
     }),
     events: [],
+    runCount: 0,
     seenEventIds: [],
     lastAcceptedRaw: null,
     testResults: {},

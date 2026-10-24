@@ -1,0 +1,41 @@
+{
+  "name": "integration-launchpad",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Customer-onboarding workspace for a fictional partner-tracking platform (demo, invented API).",
+  "author": "Kevin Gaviria",
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "e2e": "playwright test",
+    "mock-server": "node examples/mock-bayline-server.mjs",
+    "send-test": "node examples/send-test-conversion.mjs"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.56.1",
+    "@vitejs/plugin-react": "5.2.0",
+    "@vitest/coverage-v8": "5.0.3",
+    "eslint": "10.12.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.13.0",
+    "prettier": "3.9.9",
+    "vite": "7.3.7",
+    "vitest": "5.0.3"
+  }
+}

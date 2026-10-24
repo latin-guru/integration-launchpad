@@ -43,6 +43,13 @@ export default function Sidebar({ views, current, readiness, onReset }) {
       <button type="button" className="btn-quiet reset" onClick={onReset}>
         Reset demo
       </button>
+
+      <p className="credit">
+        Built by Kevin Gaviria ·{' '}
+        <a href="https://www.linkedin.com/in/kevin-gaviria" target="_blank" rel="noreferrer">
+          Connect on LinkedIn
+        </a>
+      </p>
     </aside>
   );
 }

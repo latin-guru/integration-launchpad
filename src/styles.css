@@ -198,6 +198,15 @@ textarea.code {
   }
 }
 
+.credit {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  color: #bcd0c3;
+}
+.credit a {
+  color: #fff;
+}
+
 .reset {
   color: #bcd0c3;
   border-color: rgba(255, 255, 255, 0.2);

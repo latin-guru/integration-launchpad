@@ -1,0 +1,85 @@
+{
+  "name": "Bayline Loop Conversion API",
+  "version": "v1",
+  "note": "Invented for this demo. Bayline Loop is a fictional partner-tracking platform.",
+  "endpoint": {
+    "method": "POST",
+    "path": "/v1/conversions",
+    "baseUrl": "https://api.baylineloop.example",
+    "contentType": "application/json"
+  },
+  "signature": {
+    "header": "X-Bayline-Signature",
+    "algorithm": "HMAC-SHA256",
+    "encoding": "hex",
+    "signedContent": "The exact raw request body bytes"
+  },
+  "fields": [
+    {
+      "name": "event_id",
+      "type": "string",
+      "required": true,
+      "format": "id",
+      "description": "Unique ID for this event. Bayline Loop rejects a second event with the same ID (dedupe)."
+    },
+    {
+      "name": "event_type",
+      "type": "enum",
+      "values": ["sale", "reversal"],
+      "required": true,
+      "format": null,
+      "description": "sale for a paid order, reversal when an order is refunded."
+    },
+    {
+      "name": "click_id",
+      "type": "string",
+      "required": true,
+      "format": "click_id",
+      "description": "The Bayline Loop click ID captured when the shopper arrived from a partner link."
+    },
+    {
+      "name": "order_id",
+      "type": "string",
+      "required": true,
+      "format": null,
+      "description": "The store's order ID. A reversal uses the same order_id as its sale."
+    },
+    {
+      "name": "amount",
+      "type": "integer",
+      "required": true,
+      "format": "cents",
+      "description": "Order total in the smallest currency unit (cents), so no rounding errors."
+    },
+    {
+      "name": "currency",
+      "type": "string",
+      "required": true,
+      "format": "iso4217",
+      "description": "Three-letter ISO-4217 currency code, upper case (for example USD)."
+    },
+    {
+      "name": "customer_status",
+      "type": "enum",
+      "values": ["new", "returning"],
+      "required": true,
+      "format": null,
+      "description": "Whether this is the shopper's first order. Partners can earn more for new customers."
+    },
+    {
+      "name": "promo_code",
+      "type": "string",
+      "required": false,
+      "requiredWhen": "promoCodes",
+      "format": null,
+      "description": "Discount code used at checkout. Required when the store uses promo codes."
+    },
+    {
+      "name": "occurred_at",
+      "type": "string",
+      "required": true,
+      "format": "iso8601",
+      "description": "When the order was paid, as an ISO-8601 timestamp with a time zone."
+    }
+  ]
+}

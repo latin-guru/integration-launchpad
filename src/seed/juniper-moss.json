@@ -1,0 +1,163 @@
+{
+  "project": {
+    "id": "proj-juniper-moss",
+    "customer": "Juniper & Moss",
+    "vertical": "Online plant shop (SMB e-commerce)",
+    "goLiveInDays": 21,
+    "stakeholders": [
+      { "name": "Priya Nandakumar", "role": "Owner, Juniper & Moss", "side": "customer" },
+      {
+        "name": "Tomás Reyes",
+        "role": "Freelance developer for Juniper & Moss",
+        "side": "customer"
+      },
+      { "name": "Implementation lead", "role": "Bayline Loop onboarding (you)", "side": "vendor" }
+    ],
+    "scope": {
+      "answers": {
+        "platform": "hosted",
+        "orderVolume": "1k-10k",
+        "refunds": false,
+        "promoCodes": true,
+        "crossDomain": false
+      }
+    },
+    "templateId": "affiliate-tracking"
+  },
+  "sampleOrder": {
+    "webhook_id": "wh_jm_0001",
+    "topic": "orders/paid",
+    "order": {
+      "id": 7301,
+      "name": "#JM1042",
+      "created_at": "2026-10-20T14:32:05-04:00",
+      "currency": "usd",
+      "total_price": "84.50",
+      "subtotal_price": "78.00",
+      "discount_codes": [{ "code": "fern10", "amount": "7.80" }],
+      "customer": { "id": 9001, "first_name": "Sam", "orders_count": 1 },
+      "note_attributes": [{ "name": "bayline_click_id", "value": "bl_clk_7k2m9q4t8w" }],
+      "line_items": [
+        { "title": "Fiddle-leaf fig, 10 in pot", "quantity": 1, "price": "64.00" },
+        { "title": "Moss pole", "quantity": 1, "price": "14.00" }
+      ]
+    }
+  },
+  "mappings": [
+    {
+      "targetField": "event_id",
+      "sourcePath": "webhook_id",
+      "transform": "none",
+      "notes": "Webhook IDs stay the same on retries, so dedupe works."
+    },
+    {
+      "targetField": "event_type",
+      "sourcePath": "topic",
+      "transform": "eventType",
+      "notes": "orders/paid becomes sale; refunds/create becomes reversal."
+    },
+    {
+      "targetField": "click_id",
+      "sourcePath": "order.note_attributes.0.value",
+      "transform": "none",
+      "notes": "The storefront script saves the click ID as a note attribute at checkout."
+    },
+    {
+      "targetField": "order_id",
+      "sourcePath": "order.id",
+      "transform": "toString",
+      "notes": ""
+    },
+    {
+      "targetField": "currency",
+      "sourcePath": "order.currency",
+      "transform": "upper",
+      "notes": "The store sends lower-case codes."
+    },
+    {
+      "targetField": "customer_status",
+      "sourcePath": "order.customer.orders_count",
+      "transform": "customerStatus",
+      "notes": "1 order means new; more than 1 means returning."
+    },
+    {
+      "targetField": "promo_code",
+      "sourcePath": "order.discount_codes.0.code",
+      "transform": "upper",
+      "notes": ""
+    },
+    {
+      "targetField": "occurred_at",
+      "sourcePath": "order.created_at",
+      "transform": "isoDate",
+      "notes": "Normalized to UTC."
+    }
+  ],
+  "taskStatus": {
+    "kickoff-call": "done",
+    "req-discovery": "in-progress"
+  },
+  "risks": [
+    {
+      "id": "R-1",
+      "description": "The customer's freelance developer has limited hours during holiday promo prep.",
+      "impact": "high",
+      "likelihood": "medium",
+      "mitigation": "Book two fixed working sessions now. Bayline Loop pre-builds the mapping so the developer only adds the webhook.",
+      "owner": "vendor",
+      "status": "open"
+    },
+    {
+      "id": "R-2",
+      "description": "The click ID may be dropped when partner links add extra URL parameters.",
+      "impact": "high",
+      "likelihood": "low",
+      "mitigation": "Test three real partner link formats in the test store and add a click_id check to the test plan.",
+      "owner": "customer",
+      "status": "open"
+    },
+    {
+      "id": "R-3",
+      "description": "Refunds done by hand in the store admin might never send a refund webhook.",
+      "impact": "medium",
+      "likelihood": "medium",
+      "mitigation": "Confirm the refund workflow in discovery. If it is manual, agree on a weekly reversal upload until the webhook is on.",
+      "owner": "customer",
+      "status": "open"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D-1",
+      "topic": "Amount format",
+      "optionsConsidered": ["Decimal string (\"84.50\")", "Float (84.5)", "Integer cents (8450)"],
+      "chosen": "Integer cents (8450)",
+      "rationale": "Cents avoid floating-point rounding errors when commissions are calculated and summed.",
+      "daysAgo": 6
+    },
+    {
+      "id": "D-2",
+      "topic": "Duplicate protection",
+      "optionsConsidered": [
+        "Dedupe on order_id",
+        "Dedupe on event_id",
+        "No dedupe, clean up later"
+      ],
+      "chosen": "Dedupe on event_id",
+      "rationale": "Webhook retries reuse the same event_id, so a retry can never pay a partner twice. order_id alone would block the matching reversal.",
+      "daysAgo": 5
+    },
+    {
+      "id": "D-3",
+      "topic": "Refunds",
+      "optionsConsidered": [
+        "Edit the original sale",
+        "Send a reversal event",
+        "Monthly manual adjustment"
+      ],
+      "chosen": "Send a reversal event",
+      "rationale": "A reversal keeps an audit trail: the sale and its refund are two separate, signed events with the same order_id.",
+      "daysAgo": 3
+    }
+  ]
+}

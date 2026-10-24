@@ -105,11 +105,16 @@ describe('isMapped / isRequired / mappingStatus', () => {
     expect(isMapped(undefined)).toBe(false);
   });
 
-  it('makes promo_code required only when the store uses promo codes', () => {
+  it('keeps promo_code optional whatever the discovery answers', () => {
     const promo = spec.fields.find((f) => f.name === 'promo_code');
-    expect(isRequired(promo, { promoCodes: true })).toBe(true);
-    expect(isRequired(promo, { promoCodes: false })).toBe(false);
+    expect(isRequired(promo, { promoCodes: true })).toBe(false);
     expect(isRequired(promo)).toBe(false);
+  });
+
+  it('supports requiredWhen for fields that depend on a discovery answer', () => {
+    const field = { name: 'x', type: 'string', required: false, requiredWhen: 'refunds' };
+    expect(isRequired(field, { refunds: true })).toBe(true);
+    expect(isRequired(field, { refunds: false })).toBe(false);
   });
 
   it('reports the seed as missing only amount', () => {

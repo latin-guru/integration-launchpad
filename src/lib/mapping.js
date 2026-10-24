@@ -43,8 +43,10 @@ export function isMapped(mapping) {
 }
 
 /**
- * Is this field required for this customer? Some fields only become required
- * because of a discovery answer (promo_code when the store uses promo codes).
+ * Is this field required for this customer? A field can also carry
+ * `requiredWhen: "<discovery answer key>"` to become required only for
+ * customers who answered yes. No v1 field uses it: promo_code stays optional
+ * because many orders have no code.
  * @param {FieldSpec} field
  * @param {ScopeAnswers} [answers]
  * @returns {boolean}

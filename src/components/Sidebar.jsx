@@ -1,3 +1,5 @@
+import { gateSummary } from '../lib/readiness.js';
+
 /**
  * Left-hand navigation. The steps are numbered because they are the order
  * an implementation runs in. The go-live gate is always visible at the bottom.
@@ -34,11 +36,7 @@ export default function Sidebar({ views, current, readiness, onReset }) {
         <span className="gate-dot" aria-hidden="true" />
         <span>
           <strong>{readiness.ready ? 'Ready for go-live' : 'Not ready for go-live'}</strong>
-          <small>
-            {readiness.ready
-              ? 'All required fields mapped and tests passed'
-              : `${readiness.reasons.length} blocker${readiness.reasons.length === 1 ? '' : 's'}`}
-          </small>
+          <small>{gateSummary(readiness)}</small>
         </span>
       </a>
 

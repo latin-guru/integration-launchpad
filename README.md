@@ -61,7 +61,7 @@ All logic lives in `src/lib/` as pure functions. The React components in `src/co
 The app follows the order a real implementation runs in:
 
 1. **Kickoff.** Confirm goals, owners and the go-live date. Every due date in the plan is counted back from that date, so moving go-live moves the whole plan.
-2. **Requirements (discovery).** Questions about the store's platform, order volume, refunds, promo codes and checkout domain. Answers change the plan: for example, "refunds = yes" adds a reversal-webhook task and a refund test case, and "promo codes = yes" makes `promo_code` a required field.
+2. **Requirements (discovery).** Questions about the store's platform, order volume, refunds, promo codes and checkout domain. Answers change the plan: for example, "refunds = yes" adds a reversal-webhook task and a refund test case, and "promo codes = yes" adds a task to map `promo_code` (which stays optional, because many orders have no code).
 3. **Configuration.** Map each API field to a path in the customer's sample payload and pick a transform. Unmapped required fields block go-live.
 4. **Testing.** Send sample events in the Test Console: a good order, a duplicate, a tampered body, a bad currency and (if in scope) a refund. Each result is saved as evidence on its test case.
 5. **Go-live.** The gate turns green only when every required field is mapped and every required test has passed. If it is red, it lists each blocker in plain English.
@@ -77,17 +77,17 @@ The app follows the order a real implementation runs in:
 
 `POST https://api.baylineloop.example/v1/conversions` with a JSON body. The spec lives in [`src/spec/conversion-v1.json`](src/spec/conversion-v1.json).
 
-| Field             | Type                 | Required                        | Notes                                                                   |
-| ----------------- | -------------------- | ------------------------------- | ----------------------------------------------------------------------- |
-| `event_id`        | string               | Yes                             | Unique per event. A second event with the same ID is rejected (dedupe). |
-| `event_type`      | `sale` \| `reversal` | Yes                             | `reversal` cancels the commission for a refunded order.                 |
-| `click_id`        | string               | Yes                             | Format `bl_clk_` plus 10 lower-case letters or digits.                  |
-| `order_id`        | string               | Yes                             | A reversal uses the same `order_id` as its sale.                        |
-| `amount`          | integer              | Yes                             | Smallest currency unit (cents).                                         |
-| `currency`        | string               | Yes                             | ISO-4217 code, upper case, for example `USD`.                           |
-| `customer_status` | `new` \| `returning` | Yes                             | First order or not.                                                     |
-| `promo_code`      | string               | When the store uses promo codes |                                                                         |
-| `occurred_at`     | string               | Yes                             | ISO-8601 timestamp with a time zone.                                    |
+| Field             | Type                 | Required | Notes                                                                   |
+| ----------------- | -------------------- | -------- | ----------------------------------------------------------------------- |
+| `event_id`        | string               | Yes      | Unique per event. A second event with the same ID is rejected (dedupe). |
+| `event_type`      | `sale` \| `reversal` | Yes      | `reversal` cancels the commission for a refunded order.                 |
+| `click_id`        | string               | Yes      | Format `bl_clk_` plus 10 lower-case letters or digits.                  |
+| `order_id`        | string               | Yes      | A reversal uses the same `order_id` as its sale.                        |
+| `amount`          | integer              | Yes      | Smallest currency unit (cents).                                         |
+| `currency`        | string               | Yes      | ISO-4217 code, upper case, for example `USD`.                           |
+| `customer_status` | `new` \| `returning` | Yes      | First order or not.                                                     |
+| `promo_code`      | string               | No       | Send only when the order used a code. Many orders have none.            |
+| `occurred_at`     | string               | Yes      | ISO-8601 timestamp with a time zone.                                    |
 
 **Signature scheme.** The sender computes `HMAC-SHA256(secret, raw request body)`, writes it as lower-case hex, and sends it in the `X-Bayline-Signature` header. The receiver recomputes it over the exact bytes it received and compares in constant time. A match proves the sender knows the shared secret and that the body was not changed on the way.
 

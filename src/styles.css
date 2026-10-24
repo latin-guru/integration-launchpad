@@ -181,6 +181,9 @@ textarea.code {
   flex: none;
   background: #e2574a;
   box-shadow: 0 0 0 4px rgba(226, 87, 74, 0.25);
+  transition:
+    background 0.4s,
+    box-shadow 0.4s;
 }
 .is-ready .gate-dot,
 .gate-ready .gate-dot {
@@ -188,9 +191,11 @@ textarea.code {
   box-shadow:
     0 0 0 4px rgba(70, 195, 123, 0.3),
     0 0 18px rgba(70, 195, 123, 0.7);
-  transition:
-    background 0.4s,
-    box-shadow 0.4s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gate-dot {
+    transition: none;
+  }
 }
 
 .reset {

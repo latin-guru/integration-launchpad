@@ -17,17 +17,20 @@ describe('validateEvent', () => {
     expect(results.every((r) => r.action === 'fix' && r.hint === '')).toBe(true);
   });
 
-  it('flags missing required fields, including conditionally required ones', () => {
-    const { amount: _a, promo_code: _p, ...event } = goodEvent;
+  it('flags missing required fields', () => {
+    const { amount: _a, ...event } = goodEvent;
     const result = check(validateEvent(event, spec, [], { promoCodes: true }), 'required_fields');
     expect(result.pass).toBe(false);
-    expect(result.message).toBe('Missing: amount, promo_code.');
+    expect(result.message).toBe('Missing: amount.');
     expect(result.hint).toMatch(/Mapping screen/);
   });
 
-  it('does not require promo_code when promo codes are off', () => {
+  it('never requires promo_code, even for stores that use promo codes', () => {
     const { promo_code: _p, ...event } = goodEvent;
     expect(check(validateEvent(event, spec, []), 'required_fields').pass).toBe(true);
+    expect(
+      check(validateEvent(event, spec, [], { promoCodes: true }), 'required_fields').pass,
+    ).toBe(true);
   });
 
   it('treats null and empty strings as missing', () => {

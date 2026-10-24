@@ -70,9 +70,8 @@
       "name": "promo_code",
       "type": "string",
       "required": false,
-      "requiredWhen": "promoCodes",
       "format": null,
-      "description": "Discount code used at checkout. Required when the store uses promo codes."
+      "description": "Discount code used at checkout. Optional: send it only when the order used a code."
     },
     {
       "name": "occurred_at",

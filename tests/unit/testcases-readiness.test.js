@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { deriveTestCases, evaluateRun, withResults } from '../../src/lib/testCases.js';
-import { goLiveReadiness } from '../../src/lib/readiness.js';
+import { gateSummary, goLiveReadiness } from '../../src/lib/readiness.js';
 import { answers, fullMappings, seed, spec } from './helpers.js';
 
 const event = (accepted, failed = []) => ({
@@ -69,6 +69,9 @@ describe('goLiveReadiness', () => {
     expect(goLiveReadiness(fullMappings, spec, allPassed, answers)).toEqual({
       ready: true,
       reasons: [],
+      fieldsToMap: 0,
+      testsToRun: 0,
+      testsFailed: 0,
     });
   });
 
@@ -92,6 +95,26 @@ describe('goLiveReadiness', () => {
     const optional = [{ ...allPassed[0], id: 'TC-9', required: false, status: 'failed' }];
     expect(goLiveReadiness(fullMappings, spec, [...allPassed, ...optional], answers).ready).toBe(
       true,
+    );
+  });
+});
+
+describe('gateSummary', () => {
+  const base = { ready: false, reasons: ['x'], fieldsToMap: 0, testsToRun: 0, testsFailed: 0 };
+
+  it('says mapping is done when only tests are left', () => {
+    expect(gateSummary({ ...base, testsToRun: 5 })).toBe('Mapping done, 5 tests to run');
+  });
+
+  it('lists fields to map before tests, with failed tests called out', () => {
+    expect(gateSummary({ ...base, fieldsToMap: 1, testsFailed: 1, testsToRun: 2 })).toBe(
+      '1 field to map, 1 test failed, 2 tests to run',
+    );
+  });
+
+  it('confirms everything when ready', () => {
+    expect(gateSummary({ ...base, ready: true, reasons: [] })).toBe(
+      'All required fields mapped and tests passed',
     );
   });
 });

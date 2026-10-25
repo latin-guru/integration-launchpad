@@ -91,7 +91,7 @@ The app follows the order a real implementation runs in:
 
 **Signature scheme.** The sender computes `HMAC-SHA256(secret, raw request body)`, writes it as lower-case hex, and sends it in the `X-Bayline-Signature` header. The receiver recomputes it over the exact bytes it received and compares in constant time. A match proves the sender knows the shared secret and that the body was not changed on the way.
 
-**Responses.** `202` accepted · `400` invalid JSON or failed field checks (the body lists them) · `401` missing or wrong signature · `409` duplicate `event_id` · `5xx` retry with back-off using the same `event_id`.
+**Responses.** `202` accepted · `400` invalid JSON or failed field checks (the body lists them) · `401` missing or wrong signature · `409` duplicate `event_id` · `5xx` (not produced by the mock server): a production sender should retry with back-off and reuse the same `event_id`, so the `409` duplicate check keeps retries safe. The demo scripts don't retry.
 
 ## Run it locally
 
